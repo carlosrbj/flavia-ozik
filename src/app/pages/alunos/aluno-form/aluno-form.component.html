@@ -1,0 +1,150 @@
+<div class="aluno-form">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
+    
+    <!-- Cabeçalho do Formulário -->
+    <div class="form-header">
+      <h3>{{ isEditing ? 'Editar Aluno' : 'Novo Aluno' }}</h3>
+      <p>Preencha os dados do aluno para cadastrá-lo no sistema</p>
+    </div>
+
+    <!-- Informações Pessoais -->
+    <div class="form-section">
+      <h4><i class="pi pi-user"></i> Informações Pessoais</h4>
+      
+      <div class="field">
+        <label for="nome">Nome Completo *</label>
+        <input pInputText id="nome" formControlName="nome" placeholder="Digite o nome completo" />
+        <small class="p-error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
+          Nome é obrigatório
+        </small>
+      </div>
+    </div>
+
+    <!-- Contato -->
+    <div class="form-section">
+      <h4><i class="pi pi-phone"></i> Informações de Contato</h4>
+      
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="telefone">Telefone Principal *</label>
+            <input pInputText id="telefone" formControlName="telefone" placeholder="(11) 99999-9999" />
+            <small class="p-error" *ngIf="form.get('telefone')?.invalid && form.get('telefone')?.touched">
+              Telefone é obrigatório
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="telefone2">Telefone Secundário</label>
+            <input pInputText id="telefone2" formControlName="telefone2" placeholder="(11) 88888-8888" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input pInputText id="email" type="email" formControlName="email" placeholder="email@exemplo.com" />
+        <small class="p-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          E-mail inválido
+        </small>
+      </div>
+    </div>
+
+    <!-- Informações do Curso -->
+    <div class="form-section">
+      <h4><i class="pi pi-book"></i> Informações do Curso</h4>
+      
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="dataInicio">Data de Início *</label>
+            <p-calendar id="dataInicio" formControlName="dataInicio" 
+                       dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" />
+            <small class="p-error" *ngIf="form.get('dataInicio')?.invalid && form.get('dataInicio')?.touched">
+              Data de início é obrigatória
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="nivel">Nível</label>
+            <p-dropdown id="nivel" formControlName="nivel" 
+                       [options]="nivelOptions" optionLabel="label" optionValue="value" 
+                       placeholder="Selecione" />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label for="valorMensalidade">Valor da Mensalidade *</label>
+            <p-inputNumber id="valorMensalidade" formControlName="valorMensalidade" 
+                          mode="currency" currency="BRL" locale="pt-BR" 
+                          placeholder="0,00" />
+            <small class="p-error" *ngIf="form.get('valorMensalidade')?.invalid && form.get('valorMensalidade')?.touched">
+              Valor é obrigatório
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label for="formaPagamento">Forma de Pagamento</label>
+            <p-dropdown id="formaPagamento" formControlName="formaPagamento" 
+                       [options]="pagamentoOptions" optionLabel="label" optionValue="value" 
+                       placeholder="Selecione" />
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label for="diaVencimento">Dia do Vencimento</label>
+            <p-inputNumber id="diaVencimento" formControlName="diaVencimento" 
+                          min="1" max="31" placeholder="10" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status e Observações -->
+    <div class="form-section">
+      <h4><i class="pi pi-info-circle"></i> Status e Observações</h4>
+      
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="ativo">Status</label>
+            <p-dropdown id="ativo" formControlName="ativo" 
+                       [options]="statusOptions" optionLabel="label" optionValue="value" />
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-6" *ngIf="!form.get('ativo')?.value">
+          <div class="field">
+            <label for="motivoInativo">Motivo da Inativação</label>
+            <input pInputText id="motivoInativo" formControlName="motivoInativo" 
+                   placeholder="Motivo da inativação" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="observacoes">Observações Gerais</label>
+        <textarea pInputTextarea id="observacoes" formControlName="observacoes" 
+                  rows="3" placeholder="Observações adicionais sobre o aluno"></textarea>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button pButton type="button" label="Cancelar" class="p-button-text" 
+              (click)="onCancel()"></button>
+      <button pButton type="submit" label="{{ isEditing ? 'Atualizar' : 'Cadastrar' }}" 
+              [disabled]="form.invalid || isSubmitting"></button>
+    </div>
+  </form>
+</div>

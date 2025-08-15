@@ -1,88 +1,118 @@
-<div class="grid">
-  <div class="col-12 md:col-3">
-    <div class="card">
-      <div class="flex align-items-center gap-2">
-        <i class="pi pi-users"></i>
-        <span>Total de alunos</span>
+<div class="alunos-container">
+  <!-- Lista de Alunos -->
+  <div *ngIf="!alunoSelecionado && !modoEdicao" class="lista-alunos">
+    <div class="grid">
+      <div class="col-12 md:col-3">
+        <div class="card">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-users"></i>
+            <span>Total de alunos</span>
+          </div>
+          <h2 class="mt-2">{{ totalAlunos }}</h2>
+        </div>
       </div>
-      <h2 class="mt-2">{{ totalAlunos }}</h2>
-    </div>
-  </div>
-  <div class="col-12 md:col-3">
-    <div class="card">
-      <div class="flex align-items-center gap-2">
-        <i class="pi pi-user"></i>
-        <span>Ativos</span>
+      <div class="col-12 md:col-3">
+        <div class="card">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-user-plus"></i>
+            <span>Alunos ativos</span>
+          </div>
+          <h2 class="mt-2">{{ totalAtivos }}</h2>
+        </div>
       </div>
-      <h2 class="mt-2">{{ totalAtivos }}</h2>
-    </div>
-  </div>
-  <div class="col-12 md:col-3">
-    <div class="card">
-      <div class="flex align-items-center gap-2">
-        <i class="pi pi-wallet"></i>
-        <span>Receita mensal</span>
+      <div class="col-12 md:col-3">
+        <div class="card">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-wallet"></i>
+            <span>Receita mensal</span>
+          </div>
+          <h2 class="mt-2">{{ receitaMensal | currency:'BRL' }}</h2>
+        </div>
       </div>
-      <h2 class="mt-2">{{ receitaMensal | currency:'BRL' }}</h2>
-    </div>
-  </div>
-  <div class="col-12 md:col-3">
-    <div class="card">
-      <div class="flex align-items-center gap-2">
-        <i class="pi pi-exclamation-triangle"></i>
-        <span>Mensalidades atrasadas</span>
+      <div class="col-12 md:col-3">
+        <div class="card">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>Mensalidades atrasadas</span>
+          </div>
+          <h2 class="mt-2">{{ mensalidadesAtrasadas }}</h2>
+        </div>
       </div>
-      <h2 class="mt-2">{{ mensalidadesAtrasadas }}</h2>
+
+      <div class="col-12">
+        <div class="card">
+          <div class="flex justify-content-between align-items-center mb-3">
+            <h3 class="m-0">Alunos</h3>
+            <button pButton label="Novo Aluno" icon="pi pi-plus" (click)="abrirDialogNovo()"></button>
+          </div>
+          <p-table [value]="alunos" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Email</th>
+                <th>Valor da mensalidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-aluno>
+              <tr>
+                <td>{{ aluno.nome }}</td>
+                <td>{{ aluno.telefone }}</td>
+                <td>{{ aluno.email }}</td>
+                <td>{{ aluno.valorMensalidade | currency:'BRL' }}</td>
+                <td>
+                  <p-tag [value]="aluno.ativo ? 'Ativo' : 'Inativo'" [severity]="aluno.ativo ? 'success' : 'danger'"></p-tag>
+                </td>
+                <td>
+                  <button pButton icon="pi pi-eye" class="p-button-text" (click)="visualizar(aluno)" pTooltip="Visualizar" tooltipPosition="bottom"></button>
+                  <button pButton icon="pi pi-pencil" class="p-button-text" (click)="editar(aluno)" pTooltip="Editar" tooltipPosition="bottom"></button>
+                  <button pButton icon="pi pi-trash" class="p-button-text p-button-danger" (click)="excluir(aluno)" pTooltip="Excluir" tooltipPosition="bottom"></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="col-12">
-    <div class="card">
-      <div class="flex justify-content-between align-items-center mb-3">
-        <h3 class="m-0">Alunos</h3>
-        <button pButton label="Novo Aluno" icon="pi pi-plus" (click)="abrirDialogNovo()"></button>
-      </div>
-      <p-table [value]="alunos" [paginator]="true" [rows]="10" responsiveLayout="scroll">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Nome</th>
-            <th>Telefone</th>
-            <th>Email</th>
-            <th>Valor da mensalidade</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-aluno>
-          <tr>
-            <td>{{ aluno.nome }}</td>
-            <td>{{ aluno.telefone }}</td>
-            <td>{{ aluno.email }}</td>
-            <td>{{ aluno.valorMensalidade | currency:'BRL' }}</td>
-            <td>
-              <p-tag [value]="aluno.ativo ? 'Ativo' : 'Inativo'" [severity]="aluno.ativo ? 'success' : 'danger'"></p-tag>
-            </td>
-            <td>
-              <button pButton icon="pi pi-eye" class="p-button-text" (click)="visualizar(aluno)"></button>
-              <button pButton icon="pi pi-pencil" class="p-button-text" (click)="editar(aluno)"></button>
-              <button pButton icon="pi pi-trash" class="p-button-text p-button-danger" (click)="excluir(aluno)"></button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+  <!-- Visualização Detalhada do Aluno -->
+  <div *ngIf="alunoSelecionado && !modoEdicao" class="visualizacao-aluno">
+    <div class="flex justify-content-between align-items-center mb-3">
+      <button pButton icon="pi pi-arrow-left" label="Voltar à Lista" class="p-button-outlined" (click)="voltarLista()"></button>
+      <h2 class="m-0">Visualizando: {{ alunoSelecionado.nome }}</h2>
     </div>
+    
+    <app-aluno-view 
+      [aluno]="alunoSelecionado"
+      (editarAluno)="editar($event)"
+      (excluirAluno)="excluir($event)">
+    </app-aluno-view>
+  </div>
+
+  <!-- Modo de Edição -->
+  <div *ngIf="modoEdicao" class="modo-edicao">
+    <div class="flex justify-content-between align-items-center mb-3">
+      <button pButton icon="pi pi-arrow-left" label="Voltar" class="p-button-outlined" (click)="cancelarEdicao()"></button>
+      <h2 class="m-0">Editando: {{ alunoEmEdicao?.nome }}</h2>
+    </div>
+    
+    <app-aluno-form 
+      [aluno]="alunoEmEdicao"
+      (salvar)="salvarEdicao($event)"
+      (cancelar)="cancelarEdicao()">
+    </app-aluno-form>
   </div>
 </div>
 
+<!-- Dialog para Novo Aluno -->
 <p-dialog header="Novo Aluno" [(visible)]="dialogNovoVisivel" [modal]="true" [style]="{width: '600px'}">
   <form class="p-fluid">
     <div class="field">
       <label>Nome completo</label>
       <input pInputText [(ngModel)]="novoAluno.nome" name="nome" />
-    </div>
-    <div class="field">
-      <label>Data de nascimento</label>
-      <input pInputText [(ngModel)]="novoAluno.dataNascimento" name="dataNascimento" type="date" />
     </div>
     <div class="field">
       <label>Data de início</label>
