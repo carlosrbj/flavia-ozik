@@ -1,0 +1,120 @@
+/* Cards de estatísticas com cores outonais */
+.grid .col-12.md\:col-3 .card {
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(139, 69, 19, 0.15);
+  }
+  
+  /* Primeiro card - Total de alunos */
+  &:nth-child(1) {
+    border-left-color: var(--color-ochre);
+    
+    i { color: var(--color-ochre); }
+    h2 { color: var(--color-saddle-brown); }
+  }
+  
+  /* Segundo card - Ativos */
+  &:nth-child(2) {
+    border-left-color: var(--color-moss);
+    
+    i { color: var(--color-moss); }
+    h2 { color: var(--color-saddle-brown); }
+  }
+  
+  /* Terceiro card - Receita mensal */
+  &:nth-child(3) {
+    border-left-color: var(--color-goldenrod);
+    
+    i { color: var(--color-goldenrod); }
+    h2 { color: var(--color-saddle-brown); }
+  }
+  
+  /* Quarto card - Mensalidades atrasadas */
+  &:nth-child(4) {
+    border-left-color: var(--color-terracotta);
+    
+    i { color: var(--color-terracotta); }
+    h2 { color: var(--color-saddle-brown); }
+  }
+}
+
+/* Cabeçalho da tabela */
+.card h3 {
+  color: var(--color-terracotta);
+  font-weight: 600;
+}
+
+/* Botão Novo Aluno - mantém estilo outonal completo */
+.card .p-button:not(.p-button-text) {
+  background: linear-gradient(135deg, var(--color-ochre), var(--color-goldenrod));
+  border: none;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--color-goldenrod), var(--color-amber));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(198, 142, 23, 0.3);
+  }
+}
+
+/* Botões de ações - estilo sutil e elegante */
+.p-button-text {
+  color: var(--color-saddle-brown);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(198, 142, 23, 0.1);
+    color: var(--color-ochre);
+    transform: scale(1.05);
+  }
+  
+  &.p-button-danger {
+    color: var(--color-terracotta);
+    
+    &:hover {
+      background: rgba(181, 84, 45, 0.1);
+      color: var(--color-terracotta);
+      transform: scale(1.05);
+    }
+  }
+}
+
+/* Tabela */
+.p-datatable {
+  .p-datatable-header {
+    background: linear-gradient(135deg, var(--color-burlywood), var(--color-goldenrod));
+    color: var(--color-saddle-brown);
+  }
+  
+  .p-datatable-thead > tr > th {
+    background: rgba(222, 184, 135, 0.1);
+    color: var(--color-saddle-brown);
+    border-bottom: 2px solid var(--color-goldenrod);
+  }
+}
+
+/* Dialog de novo aluno */
+.p-dialog {
+  .p-dialog-header {
+    background: linear-gradient(135deg, var(--color-terracotta), var(--color-terracotta-orange));
+    color: white;
+  }
+  
+  .p-dialog-footer {
+    .p-button-text {
+      color: var(--color-saddle-brown);
+    }
+    
+    .p-button:not(.p-button-text) {
+      background: linear-gradient(135deg, var(--color-ochre), var(--color-goldenrod));
+      border: none;
+      
+      &:hover {
+        background: linear-gradient(135deg, var(--color-goldenrod), var(--color-amber));
+      }
+    }
+  }
+}

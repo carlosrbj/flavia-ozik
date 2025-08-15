@@ -2,12 +2,14 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: var(--color-bg);
+  background: linear-gradient(135deg, var(--color-bg), var(--color-burlywood), var(--color-bg));
 }
 
 .login-card {
   width: 100%;
   max-width: 420px;
+  border: 2px solid var(--color-goldenrod);
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.15);
 }
 
 .logo {
@@ -16,7 +18,33 @@
   gap: .5rem;
   font-weight: 600;
   margin-bottom: 1rem;
+  color: var(--color-terracotta);
+  font-size: 1.1rem;
+  
+  i {
+    color: var(--color-ochre);
+    font-size: 1.5rem;
+  }
 }
 
-.form .field { margin-bottom: 1rem; }
+.form .field { 
+  margin-bottom: 1rem; 
+  
+  label {
+    color: var(--color-saddle-brown);
+    font-weight: 500;
+  }
+}
+
+.form .p-button {
+  background: linear-gradient(135deg, var(--color-terracotta), var(--color-terracotta-orange));
+  border: none;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--color-terracotta-orange), var(--color-ochre));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(198, 142, 23, 0.3);
+  }
+}
 

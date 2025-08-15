@@ -1,0 +1,37 @@
+.card {
+  background: linear-gradient(135deg, #fff, rgba(222, 184, 135, 0.05));
+  border: 2px solid var(--color-goldenrod);
+  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(139, 69, 19, 0.15);
+    border-color: var(--color-ochre);
+  }
+  
+  h2 {
+    color: var(--color-terracotta);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+  }
+  
+  p {
+    color: var(--color-saddle-brown);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+}
+
+/* Decoração adicional */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-amber), var(--color-ochre), var(--color-terracotta-orange));
+  border-radius: 12px 12px 0 0;
+}
