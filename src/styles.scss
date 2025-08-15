@@ -5,16 +5,53 @@ $color-moss: #4F6F52;
 $color-amber: #D4A017;
 $color-bg: #faf7f2;
 
+/* Novas cores outonais */
+$color-ochre: #C68E17;
+$color-terracotta-orange: #D2691E;
+$color-saddle-brown: #8B4513;
+$color-goldenrod: #DAA520;
+$color-burlywood: #DEB887;
+
 :root {
   --color-terracotta: #B5542D;
   --color-brown: #6B4F3B;
   --color-moss: #4F6F52;
   --color-amber: #D4A017;
   --color-bg: #faf7f2;
+  
+  /* Novas variáveis */
+  --color-ochre: #C68E17;
+  --color-terracotta-orange: #D2691E;
+  --color-saddle-brown: #8B4513;
+  --color-goldenrod: #DAA520;
+  --color-burlywood: #DEB887;
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--color-bg); color: #222; }
+body { margin: 0; font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--color-bg); color: var(--color-saddle-brown); }
 
 /* Helpers */
-.card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 1rem; }
+.card { 
+  background: #fff; 
+  border-radius: 12px; 
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08); 
+  padding: 1rem; 
+  border-left: 4px solid var(--color-goldenrod);
+}
+
+/* Classes utilitárias de cor */
+.text-ochre { color: var(--color-ochre); }
+.text-goldenrod { color: var(--color-goldenrod); }
+.text-terracotta { color: var(--color-terracotta); }
+.bg-ochre { background-color: var(--color-ochre); }
+.bg-goldenrod { background-color: var(--color-goldenrod); }
+.bg-burlywood { background-color: var(--color-burlywood); }
+
+/* Gradientes */
+.gradient-autumn {
+  background: linear-gradient(135deg, var(--color-amber), var(--color-ochre), var(--color-terracotta-orange));
+}
+
+.gradient-earth {
+  background: linear-gradient(135deg, var(--color-burlywood), var(--color-goldenrod), var(--color-saddle-brown));
+}
