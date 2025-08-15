@@ -1,0 +1,226 @@
+.aluno-form {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    
+    h3 {
+      color: var(--color-terracotta);
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    p {
+      color: var(--color-saddle-brown);
+      font-size: 1.1rem;
+    }
+  }
+
+  .form-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.08);
+    border-left: 4px solid var(--color-goldenrod);
+
+    h4 {
+      color: var(--color-terracotta);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        color: var(--color-ochre);
+      }
+    }
+
+    .field {
+      margin-bottom: 1rem;
+
+      label {
+        display: block;
+        color: var(--color-saddle-brown);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+
+        &::after {
+          content: ' *';
+          color: var(--color-terracotta);
+          display: none;
+        }
+
+        &[for="nome"]::after,
+        &[for="telefone"]::after,
+        &[for="dataInicio"]::after,
+        &[for="valorMensalidade"]::after {
+          display: inline;
+        }
+      }
+
+      input, textarea, .p-dropdown, .p-calendar, .p-inputnumber {
+        width: 100%;
+        border: 2px solid rgba(222, 184, 135, 0.3);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: var(--color-ochre);
+          box-shadow: 0 0 0 3px rgba(198, 142, 23, 0.1);
+        }
+
+        &:hover {
+          border-color: var(--color-goldenrod);
+        }
+      }
+
+      .p-dropdown {
+        .p-dropdown-trigger {
+          color: var(--color-ochre);
+        }
+      }
+
+      .p-calendar {
+        .p-inputtext {
+          border: none;
+          padding: 0.75rem;
+        }
+
+        .p-button {
+          background: var(--color-ochre);
+          border: none;
+          border-radius: 0 6px 6px 0;
+
+          &:hover {
+            background: var(--color-goldenrod);
+          }
+        }
+      }
+
+      .p-inputnumber {
+        .p-inputtext {
+          border: none;
+          padding: 0.75rem;
+        }
+      }
+
+      small.p-error {
+        color: var(--color-terracotta);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(222, 184, 135, 0.05);
+    border-radius: 12px;
+    border: 2px solid var(--color-goldenrod);
+
+    .p-button {
+      min-width: 120px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &.p-button-text {
+        color: var(--color-saddle-brown);
+        border-color: var(--color-saddle-brown);
+
+        &:hover {
+          background: rgba(139, 69, 19, 0.1);
+          border-color: var(--color-ochre);
+        }
+      }
+
+      &:not(.p-button-text) {
+        background: linear-gradient(135deg, var(--color-ochre), var(--color-goldenrod));
+        border: none;
+        color: white;
+
+        &:hover {
+          background: linear-gradient(135deg, var(--color-goldenrod), var(--color-amber));
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(198, 142, 23, 0.3);
+        }
+
+        &:disabled {
+          background: rgba(139, 69, 19, 0.3);
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  // Responsividade
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+
+    .form-section {
+      padding: 1rem;
+      margin-bottom: 1rem;
+
+      h4 {
+        font-size: 1.2rem;
+      }
+    }
+
+    .form-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .p-button {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  }
+
+  // Grid responsivo
+  .grid {
+    display: grid;
+    gap: 1rem;
+
+    .col-12 {
+      grid-column: span 12;
+    }
+
+    .col-6 {
+      grid-column: span 6;
+    }
+
+    .col-4 {
+      grid-column: span 4;
+    }
+
+    .col-2 {
+      grid-column: span 2;
+    }
+
+    .col-8 {
+      grid-column: span 8;
+    }
+
+    @media (max-width: 768px) {
+      .col-6, .col-4, .col-2, .col-8 {
+        grid-column: span 12;
+      }
+    }
+  }
+}
