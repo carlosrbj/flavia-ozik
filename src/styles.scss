@@ -1,0 +1,20 @@
+/* Variáveis globais */
+$color-terracotta: #B5542D;
+$color-brown: #6B4F3B;
+$color-moss: #4F6F52;
+$color-amber: #D4A017;
+$color-bg: #faf7f2;
+
+:root {
+  --color-terracotta: #B5542D;
+  --color-brown: #6B4F3B;
+  --color-moss: #4F6F52;
+  --color-amber: #D4A017;
+  --color-bg: #faf7f2;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--color-bg); color: #222; }
+
+/* Helpers */
+.card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 1rem; }

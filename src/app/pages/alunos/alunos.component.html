@@ -1,0 +1,120 @@
+<div class="grid">
+  <div class="col-12 md:col-3">
+    <div class="card">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-users"></i>
+        <span>Total de alunos</span>
+      </div>
+      <h2 class="mt-2">{{ totalAlunos }}</h2>
+    </div>
+  </div>
+  <div class="col-12 md:col-3">
+    <div class="card">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-user"></i>
+        <span>Ativos</span>
+      </div>
+      <h2 class="mt-2">{{ totalAtivos }}</h2>
+    </div>
+  </div>
+  <div class="col-12 md:col-3">
+    <div class="card">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-wallet"></i>
+        <span>Receita mensal</span>
+      </div>
+      <h2 class="mt-2">{{ receitaMensal | currency:'BRL' }}</h2>
+    </div>
+  </div>
+  <div class="col-12 md:col-3">
+    <div class="card">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Mensalidades atrasadas</span>
+      </div>
+      <h2 class="mt-2">{{ mensalidadesAtrasadas }}</h2>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="flex justify-content-between align-items-center mb-3">
+        <h3 class="m-0">Alunos</h3>
+        <button pButton label="Novo Aluno" icon="pi pi-plus" (click)="abrirDialogNovo()"></button>
+      </div>
+      <p-table [value]="alunos" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>Email</th>
+            <th>Valor da mensalidade</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-aluno>
+          <tr>
+            <td>{{ aluno.nome }}</td>
+            <td>{{ aluno.telefone }}</td>
+            <td>{{ aluno.email }}</td>
+            <td>{{ aluno.valorMensalidade | currency:'BRL' }}</td>
+            <td>
+              <p-tag [value]="aluno.ativo ? 'Ativo' : 'Inativo'" [severity]="aluno.ativo ? 'success' : 'danger'"></p-tag>
+            </td>
+            <td>
+              <button pButton icon="pi pi-eye" class="p-button-text" (click)="visualizar(aluno)"></button>
+              <button pButton icon="pi pi-pencil" class="p-button-text" (click)="editar(aluno)"></button>
+              <button pButton icon="pi pi-trash" class="p-button-text p-button-danger" (click)="excluir(aluno)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog header="Novo Aluno" [(visible)]="dialogNovoVisivel" [modal]="true" [style]="{width: '600px'}">
+  <form class="p-fluid">
+    <div class="field">
+      <label>Nome completo</label>
+      <input pInputText [(ngModel)]="novoAluno.nome" name="nome" />
+    </div>
+    <div class="field">
+      <label>Data de nascimento</label>
+      <input pInputText [(ngModel)]="novoAluno.dataNascimento" name="dataNascimento" type="date" />
+    </div>
+    <div class="field">
+      <label>Data de início</label>
+      <input pInputText [(ngModel)]="novoAluno.dataInicio" name="dataInicio" type="date" />
+    </div>
+    <div class="grid">
+      <div class="col-12 md:col-6 field">
+        <label>Telefone</label>
+        <input pInputText [(ngModel)]="novoAluno.telefone" name="telefone" />
+      </div>
+      <div class="col-12 md:col-6 field">
+        <label>Email</label>
+        <input pInputText [(ngModel)]="novoAluno.email" name="email" />
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-12 md:col-6 field">
+        <label>Valor mensalidade</label>
+        <input pInputText [(ngModel)]="novoAluno.valorMensalidade" name="valorMensalidade" type="number" />
+      </div>
+      <div class="col-12 md:col-6 field">
+        <label>Status</label>
+        <p-dropdown [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="novoAluno.ativo" name="ativo"></p-dropdown>
+      </div>
+    </div>
+    <div class="field">
+      <label>Observações</label>
+      <textarea pInputTextarea rows="3" [(ngModel)]="novoAluno.observacoes" name="observacoes"></textarea>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" class="p-button-text" (click)="dialogNovoVisivel=false"></button>
+    <button pButton label="Cadastrar" (click)="cadastrar()"></button>
+  </ng-template>
+</p-dialog>
