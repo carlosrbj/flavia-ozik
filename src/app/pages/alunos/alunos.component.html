@@ -49,7 +49,7 @@
         <p-table [value]="alunos" [paginator]="true" [rows]="10" responsiveLayout="scroll">
           <ng-template pTemplate="header">
             <tr>
-              <th>Nome</th>
+              <th>Aluno</th>
               <th>Telefone</th>
               <th>Email</th>
               <th>Valor da mensalidade</th>
@@ -59,7 +59,12 @@
           </ng-template>
           <ng-template pTemplate="body" let-aluno>
             <tr>
-              <td>{{ aluno.nome }}</td>
+              <td>
+                <div class="aluno-avatar">
+                  <img [src]="aluno.fotoUrl" *ngIf="aluno.fotoUrl" [alt]="aluno.nome" />
+                </div>
+                {{ aluno.nome }}
+              </td>
               <td>{{ aluno.telefone }}</td>
               <td>{{ aluno.email }}</td>
               <td>{{ aluno.valorMensalidade | currency:'BRL' }}</td>
@@ -95,60 +100,72 @@
     </app-aluno-view>
   </div>
 
-  <!-- Modo de Edição -->
-  <div *ngIf="modoEdicao" class="modo-edicao">
-    <div class="flex justify-content-between align-items-center mb-3">
-      <button pButton icon="pi pi-arrow-left" label="Voltar" class="p-button-outlined" (click)="cancelarEdicao()"></button>
-      <h2 class="m-0">Editando: {{ alunoEmEdicao?.nome }}</h2>
-    </div>
-    
-    <app-aluno-form 
-      [aluno]="alunoEmEdicao"
-      (salvar)="salvarEdicao($event)"
-      (cancelar)="cancelarEdicao()">
-    </app-aluno-form>
-  </div>
+
 </div>
 
-<!-- Dialog para Novo Aluno -->
-<p-dialog header="Novo Aluno" [(visible)]="dialogNovoVisivel" [modal]="true" [style]="{width: '600px'}">
+<!-- Dialog para Novo/Editar Aluno -->
+<p-dialog [header]="alunoEmEdicao ? 'Editar Aluno' : 'Novo Aluno'" [(visible)]="dialogNovoVisivel" [modal]="true" [style]="{width: '600px'}">
   <form class="p-fluid">
     <div class="field">
       <label>Nome completo</label>
-      <input pInputText [(ngModel)]="novoAluno.nome" name="nome" />
+      <input pInputText [(ngModel)]="alunoEmFormulario.nome" name="nome" />
     </div>
+    
+    <div class="field">
+      <label>Foto do Aluno</label>
+      <div class="photo-upload-container">
+        <div class="aluno-avatar" *ngIf="alunoEmFormulario.fotoUrl; else photoPlaceholder">
+          <img [src]="alunoEmFormulario.fotoUrl" alt="Foto do aluno" />
+          <button type="button" pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text remove-photo" 
+                  (click)="removerFoto()" pTooltip="Remover foto"></button>
+        </div>
+        <ng-template #photoPlaceholder>
+          <div class="photo-placeholder">
+            <i class="pi pi-user"></i>
+            <span>Sem foto</span>
+          </div>
+        </ng-template>
+        <div class="photo-actions">
+          <input type="file" #fileInput accept="image/*" (change)="onFotoSelecionada($event)" style="display: none;" />
+          <button type="button" pButton label="Escolher Foto" icon="pi pi-upload" 
+                  class="p-button-outlined" (click)="fileInput.click()"></button>
+        </div>
+        <small class="photo-info">Formatos aceitos: JPG, PNG (máx. 5MB)</small>
+      </div>
+    </div>
+    
     <div class="field">
       <label>Data de início</label>
-      <input pInputText [(ngModel)]="novoAluno.dataInicio" name="dataInicio" type="date" />
+      <input pInputText [(ngModel)]="alunoEmFormulario.dataInicio" name="dataInicio" type="date" />
     </div>
     <div class="grid">
       <div class="col-12 md:col-6 field">
         <label>Telefone</label>
-        <input pInputText [(ngModel)]="novoAluno.telefone" name="telefone" />
+        <input pInputText [(ngModel)]="alunoEmFormulario.telefone" name="telefone" />
       </div>
       <div class="col-12 md:col-6 field">
         <label>Email</label>
-        <input pInputText [(ngModel)]="novoAluno.email" name="email" />
+        <input pInputText [(ngModel)]="alunoEmFormulario.email" name="email" />
       </div>
     </div>
     <div class="grid">
       <div class="col-12 md:col-6 field">
         <label>Valor mensalidade</label>
-        <input pInputText [(ngModel)]="novoAluno.valorMensalidade" name="valorMensalidade" type="number" />
+        <input pInputText [(ngModel)]="alunoEmFormulario.valorMensalidade" name="valorMensalidade" type="number" />
       </div>
       <div class="col-12 md:col-6 field">
         <label>Status</label>
-        <p-dropdown [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="novoAluno.ativo" name="ativo"></p-dropdown>
+        <p-dropdown [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="alunoEmFormulario.ativo" name="ativo"></p-dropdown>
       </div>
     </div>
     <div class="field">
       <label>Observações</label>
-      <textarea pInputTextarea rows="3" [(ngModel)]="novoAluno.observacoes" name="observacoes"></textarea>
+      <textarea pInputTextarea rows="3" [(ngModel)]="alunoEmFormulario.observacoes" name="observacoes"></textarea>
     </div>
   </form>
   <ng-template pTemplate="footer">
-    <button pButton label="Cancelar" class="p-button-text" (click)="dialogNovoVisivel=false"></button>
-    <button pButton label="Cadastrar" (click)="cadastrar()"></button>
+    <button pButton label="Cancelar" class="p-button-text" (click)="cancelarFormulario()"></button>
+    <button pButton [label]="alunoEmEdicao ? 'Salvar' : 'Cadastrar'" (click)="salvarAluno()"></button>
   </ng-template>
 </p-dialog>
 
@@ -156,41 +173,14 @@
 <p-dialog header="Gerar Nova Mensalidade" [(visible)]="dialogMensalidadeVisivel" [modal]="true" [style]="{width: '500px'}">
   <form class="p-fluid">
     <div class="field">
-      <label>Aluno</label>
-      <p-dropdown 
-        [options]="alunosAtivos" 
-        optionLabel="nome" 
-        optionValue="id" 
-        [(ngModel)]="novaMensalidade.alunoId" 
-        name="alunoId"
-        placeholder="Selecione o aluno"
-        [showClear]="true">
-      </p-dropdown>
-    </div>
-    
-    <div class="grid">
-      <div class="col-12 md:col-6 field">
-        <label>Mês</label>
-        <p-dropdown 
-          [options]="mesesOptions" 
-          optionLabel="label" 
-          optionValue="value" 
-          [(ngModel)]="novaMensalidade.mes" 
-          name="mes"
-          placeholder="Selecione o mês">
-        </p-dropdown>
-      </div>
-      <div class="col-12 md:col-6 field">
-        <label>Ano</label>
-        <p-dropdown 
-          [options]="anosOptions" 
-          optionLabel="label" 
-          optionValue="value" 
-          [(ngModel)]="novaMensalidade.ano" 
-          name="ano"
-          placeholder="Selecione o ano">
-        </p-dropdown>
-      </div>
+      <label>Data de Vencimento</label>
+      <p-calendar 
+        [(ngModel)]="novaMensalidade.dataVencimento" 
+        name="dataVencimento"
+        dateFormat="dd/mm/yy"
+        placeholder="Selecione a data de vencimento"
+        [showIcon]="true">
+      </p-calendar>
     </div>
     
     <div class="grid">
@@ -219,17 +209,6 @@
     </div>
     
     <div class="field">
-      <label>Dia do Vencimento</label>
-      <p-inputNumber 
-        [(ngModel)]="novaMensalidade.diaVencimento" 
-        name="diaVencimento" 
-        min="1" 
-        max="31" 
-        placeholder="10">
-      </p-inputNumber>
-    </div>
-    
-    <div class="field">
       <label>Observações</label>
       <textarea pInputTextarea rows="2" [(ngModel)]="novaMensalidade.observacoes" name="observacoes" placeholder="Observações sobre a mensalidade"></textarea>
     </div>
@@ -237,25 +216,14 @@
   
   <ng-template pTemplate="footer">
     <button pButton label="Cancelar" class="p-button-text" (click)="dialogMensalidadeVisivel=false"></button>
-    <button pButton label="Gerar Mensalidade" (click)="gerarMensalidade()" [disabled]="!novaMensalidade.alunoId || !novaMensalidade.mes || !novaMensalidade.ano || !novaMensalidade.valor"></button>
+    <button pButton label="Gerar Mensalidade" (click)="gerarMensalidade()" [disabled]="!novaMensalidade.dataVencimento || !novaMensalidade.valor"></button>
   </ng-template>
 </p-dialog>
 
 <!-- Dialog para Agendar Nova Aula -->
 <p-dialog header="Agendar Nova Aula" [(visible)]="dialogAulaVisivel" [modal]="true" [style]="{width: '500px'}">
   <form class="p-fluid">
-    <div class="field">
-      <label>Aluno</label>
-      <p-dropdown 
-        [options]="alunosAtivos" 
-        optionLabel="nome" 
-        optionValue="id" 
-        [(ngModel)]="novaAula.alunoId" 
-        name="alunoId"
-        placeholder="Selecione o aluno"
-        [showClear]="true">
-      </p-dropdown>
-    </div>
+
     
     <div class="grid">
       <div class="col-12 md:col-6 field">
@@ -304,25 +272,14 @@
   
   <ng-template pTemplate="footer">
     <button pButton label="Cancelar" class="p-button-text" (click)="dialogAulaVisivel=false"></button>
-    <button pButton label="Agendar Aula" (click)="agendarAula()" [disabled]="!novaAula.alunoId || !novaAula.data || !novaAula.horario"></button>
+    <button pButton label="Agendar Aula" (click)="agendarAula()" [disabled]="!novaAula.data || !novaAula.horario"></button>
   </ng-template>
 </p-dialog>
 
 <!-- Dialog para Agendar Nova Queima -->
 <p-dialog header="Agendar Nova Queima" [(visible)]="dialogQueimaVisivel" [modal]="true" [style]="{width: '500px'}">
   <form class="p-fluid">
-    <div class="field">
-      <label>Aluno</label>
-      <p-dropdown 
-        [options]="alunosAtivos" 
-        optionLabel="nome" 
-        optionValue="id" 
-        [(ngModel)]="novaQueima.alunoId" 
-        name="alunoId"
-        placeholder="Selecione o aluno"
-        [showClear]="true">
-      </p-dropdown>
-    </div>
+
     
     <div class="grid">
       <div class="col-12 md:col-6 field">
@@ -367,6 +324,6 @@
   
   <ng-template pTemplate="footer">
     <button pButton label="Cancelar" class="p-button-text" (click)="dialogQueimaVisivel=false"></button>
-    <button pButton label="Agendar Queima" (click)="agendarQueima()" [disabled]="!novaQueima.alunoId || !novaQueima.data || !novaQueima.tipo"></button>
+    <button pButton label="Agendar Queima" (click)="agendarQueima()" [disabled]="!novaQueima.data || !novaQueima.tipo"></button>
   </ng-template>
 </p-dialog>

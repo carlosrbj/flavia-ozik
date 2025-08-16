@@ -11,7 +11,11 @@ const routes: Routes = [
     component: LayoutComponent,
     children: [
       { path: 'home', loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule) },
-      { path: 'alunos', loadChildren: () => import('./pages/alunos/alunos.module').then(m => m.AlunosModule) }
+      { path: 'alunos', loadChildren: () => import('./pages/alunos/alunos.module').then(m => m.AlunosModule) },
+      { path: 'fornadas', loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule) },
+      { path: 'catalogo', loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule) },
+      { path: 'custos-atelie', loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule) },
+      { path: 'capivarias', loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule) }
     ]
   }
 ];

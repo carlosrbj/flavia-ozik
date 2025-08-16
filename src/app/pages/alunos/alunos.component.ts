@@ -8,11 +8,9 @@ import { Queima } from '../../core/models/queima';
 // Interface para nova mensalidade
 interface NovaMensalidade {
   alunoId?: number;
-  mes?: number;
-  ano?: number;
+  dataVencimento?: Date;
   valor?: number;
   desconto?: number;
-  diaVencimento?: number;
   observacoes?: string;
 }
 
@@ -99,9 +97,12 @@ export class AlunosComponent implements OnInit {
     ativo: true
   };
 
+  // Propriedades para o popup unificado de criação/edição
+  alunoEmFormulario: Partial<Student> = { ativo: true };
+  fotoSelecionada: File | null = null;
+
   novaMensalidade: NovaMensalidade = {
-    desconto: 0,
-    diaVencimento: 10
+    desconto: 0
   };
 
   novaAula: NovaAula = {
@@ -129,28 +130,37 @@ export class AlunosComponent implements OnInit {
     this.mensalidadesAtrasadas = this.alunosService.contarMensalidadesAtrasadas();
   }
 
-  abrirDialogNovo(): void { 
-    this.dialogNovoVisivel = true; 
-  }
+
 
   // Métodos para Mensalidades
   abrirDialogMensalidade(alunoId?: number): void {
     this.dialogMensalidadeVisivel = true;
     if (alunoId) {
       this.novaMensalidade.alunoId = alunoId;
+    } else if (this.alunoSelecionado) {
+      this.novaMensalidade.alunoId = this.alunoSelecionado.id!;
     }
     this.resetarNovaMensalidade();
   }
 
   resetarNovaMensalidade(): void {
     this.novaMensalidade = {
-      desconto: 0,
-      diaVencimento: 10
+      desconto: 0
     };
   }
 
   gerarMensalidade(): void {
-    if (!this.novaMensalidade.alunoId || !this.novaMensalidade.mes || !this.novaMensalidade.ano || !this.novaMensalidade.valor) {
+    if (!this.novaMensalidade.dataVencimento || !this.novaMensalidade.valor) {
+      return;
+    }
+
+    // Se não tiver alunoId definido, usar o aluno selecionado
+    if (!this.novaMensalidade.alunoId && this.alunoSelecionado) {
+      this.novaMensalidade.alunoId = this.alunoSelecionado.id!;
+    }
+
+    if (!this.novaMensalidade.alunoId) {
+      console.error('Nenhum aluno selecionado');
       return;
     }
 
@@ -158,11 +168,16 @@ export class AlunosComponent implements OnInit {
     const aluno = this.alunos.find(a => a.id === this.novaMensalidade.alunoId);
     if (!aluno) return;
 
+    // Extrair mês e ano da data de vencimento
+    const dataVencimento = new Date(this.novaMensalidade.dataVencimento);
+    const mes = dataVencimento.getMonth() + 1;
+    const ano = dataVencimento.getFullYear();
+
     // Gerar a mensalidade
     const mensalidadeGerada = this.alunosService.gerarMensalidade(
       this.novaMensalidade.alunoId,
-      this.novaMensalidade.mes,
-      this.novaMensalidade.ano
+      mes,
+      ano
     );
 
     if (mensalidadeGerada) {
@@ -173,11 +188,10 @@ export class AlunosComponent implements OnInit {
       if (this.novaMensalidade.desconto !== undefined) {
         mensalidadeGerada.desconto = this.novaMensalidade.desconto;
       }
-      if (this.novaMensalidade.diaVencimento) {
-        // Recalcular a data de vencimento
-        const vencimento = new Date(this.novaMensalidade.ano, this.novaMensalidade.mes - 1, this.novaMensalidade.diaVencimento);
-        mensalidadeGerada.vencimento = vencimento.toISOString().split('T')[0];
-      }
+      
+      // Atualizar a data de vencimento
+      mensalidadeGerada.vencimento = dataVencimento.toISOString().split('T')[0];
+      
       if (this.novaMensalidade.observacoes) {
         mensalidadeGerada.observacoes = this.novaMensalidade.observacoes;
       }
@@ -198,6 +212,8 @@ export class AlunosComponent implements OnInit {
     this.dialogAulaVisivel = true;
     if (alunoId) {
       this.novaAula.alunoId = alunoId;
+    } else if (this.alunoSelecionado) {
+      this.novaAula.alunoId = this.alunoSelecionado.id!;
     }
     this.resetarNovaAula();
   }
@@ -209,6 +225,11 @@ export class AlunosComponent implements OnInit {
   }
 
   agendarAula(): void {
+    // Se não tiver alunoId definido, usar o aluno selecionado
+    if (!this.novaAula.alunoId && this.alunoSelecionado) {
+      this.novaAula.alunoId = this.alunoSelecionado.id!;
+    }
+
     if (!this.novaAula.alunoId || !this.novaAula.data || !this.novaAula.horario) {
       return;
     }
@@ -242,6 +263,8 @@ export class AlunosComponent implements OnInit {
     this.dialogQueimaVisivel = true;
     if (alunoId) {
       this.novaQueima.alunoId = alunoId;
+    } else if (this.alunoSelecionado) {
+      this.novaQueima.alunoId = this.alunoSelecionado.id!;
     }
     this.resetarNovaQueima();
   }
@@ -251,6 +274,11 @@ export class AlunosComponent implements OnInit {
   }
 
   agendarQueima(): void {
+    // Se não tiver alunoId definido, usar o aluno selecionado
+    if (!this.novaQueima.alunoId && this.alunoSelecionado) {
+      this.novaQueima.alunoId = this.alunoSelecionado.id!;
+    }
+
     if (!this.novaQueima.alunoId || !this.novaQueima.data || !this.novaQueima.tipo) {
       return;
     }
@@ -285,6 +313,63 @@ export class AlunosComponent implements OnInit {
     this.novoAluno = { ativo: true };
   }
 
+  // Métodos para o popup unificado
+  onFotoSelecionada(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.fotoSelecionada = file;
+      this.alunoEmFormulario.fotoUrl = URL.createObjectURL(file);
+    }
+  }
+
+  removerFoto(): void {
+    this.fotoSelecionada = null;
+    this.alunoEmFormulario.fotoUrl = undefined;
+  }
+
+  abrirDialogNovo(): void {
+    this.alunoEmEdicao = null;
+    this.alunoEmFormulario = { ativo: true };
+    this.fotoSelecionada = null;
+    this.dialogNovoVisivel = true;
+  }
+
+  salvarAluno(): void {
+    if (!this.alunoEmFormulario.nome) return;
+
+    if (this.alunoEmEdicao) {
+      // Atualizar aluno existente
+      const alunoAtualizado = { ...this.alunoEmEdicao, ...this.alunoEmFormulario };
+      this.alunosService.atualizar(alunoAtualizado.id!, alunoAtualizado);
+      this.alunos = this.alunosService.listar();
+      this.atualizarPainel();
+      this.dialogNovoVisivel = false;
+      this.alunoEmFormulario = { ativo: true };
+      this.fotoSelecionada = null;
+      this.alunoEmEdicao = null;
+      
+      // Se estava editando um aluno selecionado, atualizar a referência
+      if (this.alunoSelecionado && this.alunoSelecionado.id === alunoAtualizado.id) {
+        this.alunoSelecionado = alunoAtualizado;
+      }
+    } else {
+      // Criar novo aluno
+      this.alunosService.cadastrar(this.alunoEmFormulario as Student);
+      this.alunos = this.alunosService.listar();
+      this.atualizarPainel();
+      this.dialogNovoVisivel = false;
+      this.alunoEmFormulario = { ativo: true };
+      this.fotoSelecionada = null;
+    }
+  }
+
+  cancelarFormulario(): void {
+    this.dialogNovoVisivel = false;
+    this.alunoEmFormulario = { ativo: true };
+    this.fotoSelecionada = null;
+    this.alunoEmEdicao = null;
+  }
+
   // Método para visualizar aluno detalhadamente
   visualizar(aluno: Student): void {
     this.alunoSelecionado = aluno;
@@ -302,8 +387,10 @@ export class AlunosComponent implements OnInit {
   // Método para editar aluno
   editar(aluno: Student): void {
     this.alunoEmEdicao = { ...aluno }; // Cria uma cópia para edição
+    this.alunoEmFormulario = { ...aluno }; // Preenche o formulário
     this.modoEdicao = true;
     this.alunoSelecionado = null;
+    this.dialogNovoVisivel = true; // Abre o popup unificado
   }
 
   // Método para salvar as edições
