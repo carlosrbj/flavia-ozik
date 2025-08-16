@@ -22,9 +22,9 @@
     
     <div class="aluno-actions">
       <button pButton icon="pi pi-pencil" label="Editar" 
-              class="p-button-outlined" (click)="editar()"></button>
+              class="p-button-outlined" (click)="onEditar()"></button>
       <button pButton icon="pi pi-trash" label="Excluir" 
-              class="p-button-outlined p-button-danger" (click)="excluir()"></button>
+              class="p-button-outlined p-button-danger" (click)="onExcluir()"></button>
     </div>
   </div>
 
@@ -51,7 +51,7 @@
             </div>
             <div class="info-item">
               <label>Forma de Pagamento:</label>
-              <span>{{ getPagamentoLabel(aluno.formaPagamento) }}</span>
+              <span>{{ getFormaPagamentoLabel(aluno.formaPagamento) }}</span>
             </div>
             <div class="info-item">
               <label>Dia do Vencimento:</label>
@@ -78,62 +78,29 @@
     <p-tabPanel header="Financeiro" leftIcon="pi pi-wallet">
       <div class="tab-content">
         <div class="grid">
-          <div class="col-12 md:col-3">
+          <div class="col-12 md:col-6">
             <div class="stat-card">
-              <h5>Mensalidades em Aberto</h5>
-              <p class="stat-value">{{ mensalidadesEmAberto }}</p>
+              <h5>Total de Mensalidades</h5>
+              <p class="stat-value">{{ totalMensalidades }}</p>
             </div>
           </div>
-          <div class="col-12 md:col-3">
+          <div class="col-12 md:col-6">
             <div class="stat-card">
-              <h5>Queimas em Aberto</h5>
-              <p class="stat-value">{{ queimasEmAberto }}</p>
+              <h5>Mensalidades Pagas</h5>
+              <p class="stat-value">{{ mensalidadesPagas }}</p>
             </div>
           </div>
-          <div class="col-12 md:col-3">
+          <div class="col-12 md:col-6">
             <div class="stat-card">
-              <h5>Total Pago Mensalidades</h5>
-              <p class="stat-value">{{ totalPagoMensalidades | currency:'BRL' }}</p>
+              <h5>Mensalidades Atrasadas</h5>
+              <p class="stat-value">{{ mensalidadesAtrasadas }}</p>
             </div>
           </div>
-          <div class="col-12 md:col-3">
+          <div class="col-12 md:col-6">
             <div class="stat-card">
-              <h5>Total Pago Queimas</h5>
-              <p class="stat-value">{{ totalPagoQueimas | currency:'BRL' }}</p>
+              <h5>Total de Aulas</h5>
+              <p class="stat-value">{{ totalAulas }}</p>
             </div>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="col-12">
-            <h4>Próximos Vencimentos</h4>
-            <p-table [value]="proximosVencimentos" [paginator]="true" [rows]="5">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Mês/Ano</th>
-                  <th>Vencimento</th>
-                  <th>Valor</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-mensalidade>
-                <tr>
-                  <td>{{ mensalidade.mes }}/{{ mensalidade.ano }}</td>
-                  <td>{{ mensalidade.vencimento | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ mensalidade.valor | currency:'BRL' }}</td>
-                  <td>
-                    <p-tag [value]="getStatusLabel(mensalidade.status)" 
-                           [severity]="getStatusSeverity(mensalidade.status)"></p-tag>
-                  </td>
-                  <td>
-                    <button pButton icon="pi pi-dollar" class="p-button-text" 
-                            (click)="registrarPagamento(mensalidade)" 
-                            *ngIf="mensalidade.status === 'EM_ABERTO'"></button>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
           </div>
         </div>
 
@@ -155,147 +122,156 @@
       </div>
     </p-tabPanel>
 
-    <!-- Aba: Mensalidades -->
-    <p-tabPanel header="Mensalidades" leftIcon="pi pi-calendar">
-      <div class="tab-content">
-        <div class="grid">
-          <div class="col-12">
-            <div class="section-header">
-              <h4>Mensalidades</h4>
-              <button pButton label="Gerar Nova Mensalidade" icon="pi pi-plus" 
-                      (click)="gerarNovaMensalidade()"></button>
-            </div>
-            
-            <p-table [value]="mensalidades" [paginator]="true" [rows]="10">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Mês/Ano</th>
-                  <th>Vencimento</th>
-                  <th>Valor</th>
-                  <th>Desconto</th>
-                  <th>Status</th>
-                  <th>Aulas Geradas</th>
-                  <th>Aulas Realizadas</th>
-                  <th>Ações</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-mensalidade>
-                <tr>
-                  <td>{{ mensalidade.mes }}/{{ mensalidade.ano }}</td>
-                  <td>{{ mensalidade.vencimento | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ mensalidade.valor | currency:'BRL' }}</td>
-                  <td>{{ mensalidade.desconto | currency:'BRL' || 'R$ 0,00' }}</td>
-                  <td>
-                    <p-tag [value]="getStatusLabel(mensalidade.status)" 
-                           [severity]="getStatusSeverity(mensalidade.status)"></p-tag>
-                  </td>
-                  <td>{{ mensalidade.aulasGeradas }}</td>
-                  <td>{{ mensalidade.aulasRealizadas }}</td>
-                  <td>
-                    <button pButton icon="pi pi-eye" class="p-button-text" 
-                            (click)="verAulas(mensalidade)"></button>
-                    <button pButton icon="pi pi-pencil" class="p-button-text" 
-                            (click)="editarMensalidade(mensalidade)"></button>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+    <!-- Aba Mensalidades -->
+    <p-tabPanel header="Mensalidades">
+      <div class="mensalidades-container">
+        <div class="flex justify-content-between align-items-center mb-3">
+          <h4 class="m-0">Histórico de Mensalidades</h4>
+          <button pButton 
+                  label="Gerar Nova Mensalidade" 
+                  icon="pi pi-plus" 
+                  class="p-button-outlined"
+                  (click)="onGerarNovaMensalidade()">
+          </button>
         </div>
+        
+        <p-table [value]="mensalidades" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Mês/Ano</th>
+              <th>Valor</th>
+              <th>Desconto</th>
+              <th>Vencimento</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-mensalidade>
+            <tr>
+              <td>{{ mensalidade.mes }}/{{ mensalidade.ano }}</td>
+              <td>{{ mensalidade.valor | currency:'BRL' }}</td>
+              <td>{{ mensalidade.desconto | currency:'BRL' }}</td>
+              <td>{{ mensalidade.vencimento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <p-tag [value]="getStatusMensalidadeLabel(mensalidade.status)" 
+                       [severity]="getStatusMensalidadeSeverity(mensalidade.status)">
+                </p-tag>
+              </td>
+              <td>
+                <button pButton icon="pi pi-eye" class="p-button-text" 
+                        (click)="visualizarMensalidade(mensalidade)" 
+                        pTooltip="Visualizar" tooltipPosition="bottom">
+                </button>
+                <button pButton icon="pi pi-pencil" class="p-button-text" 
+                        (click)="editarMensalidade(mensalidade)" 
+                        pTooltip="Editar" tooltipPosition="bottom">
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
     </p-tabPanel>
 
-    <!-- Aba: Aulas -->
-    <p-tabPanel header="Aulas" leftIcon="pi pi-book">
-      <div class="tab-content">
-        <div class="grid">
-          <div class="col-12">
-            <h4>Aulas</h4>
-            <p-table [value]="aulas" [paginator]="true" [rows]="10">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Data</th>
-                  <th>Horário</th>
-                  <th>Duração</th>
-                  <th>Tipo</th>
-                  <th>Status</th>
-                  <th>Presença</th>
-                  <th>Ações</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-aula>
-                <tr>
-                  <td>{{ aula.data | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ aula.horarioInicio }} - {{ aula.horarioFim }}</td>
-                  <td>{{ aula.duracao / 60 }}h</td>
-                  <td>{{ getTipoLabel(aula.tipo) }}</td>
-                  <td>
-                    <p-tag [value]="getStatusAulaLabel(aula.status)" 
-                           [severity]="getStatusAulaSeverity(aula.status)"></p-tag>
-                  </td>
-                  <td>
-                    <p-tag [value]="getPresencaLabel(aula.presenca)" 
-                           [severity]="getPresencaSeverity(aula.presenca)"></p-tag>
-                  </td>
-                  <td>
-                    <button pButton icon="pi pi-pencil" class="p-button-text" 
-                            (click)="editarAula(aula)"></button>
-                    <button pButton icon="pi pi-trash" class="p-button-text p-button-danger" 
-                            (click)="excluirAula(aula)"></button>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+    <!-- Aba Aulas -->
+    <p-tabPanel header="Aulas">
+      <div class="aulas-container">
+        <div class="flex justify-content-between align-items-center mb-3">
+          <h4 class="m-0">Histórico de Aulas</h4>
+          <button pButton 
+                  label="Agendar Nova Aula" 
+                  icon="pi pi-plus" 
+                  class="p-button-outlined"
+                  (click)="onAgendarNovaAula()">
+          </button>
         </div>
+        
+        <p-table [value]="aulas" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Data</th>
+              <th>Horário</th>
+              <th>Duração</th>
+              <th>Conteúdo</th>
+              <th>Presença</th>
+              <th>Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-aula>
+            <tr>
+              <td>{{ aula.data | date:'dd/MM/yyyy' }}</td>
+              <td>{{ aula.horario }}</td>
+              <td>{{ aula.duracao }}h</td>
+              <td>{{ aula.conteudo }}</td>
+              <td>
+                <p-tag [value]="getPresencaLabel(aula.presenca)" 
+                       [severity]="getPresencaSeverity(aula.presenca)">
+                </p-tag>
+              </td>
+              <td>
+                <button pButton icon="pi pi-eye" class="p-button-text" 
+                        (click)="visualizarAula(aula)" 
+                        pTooltip="Visualizar" tooltipPosition="bottom">
+                </button>
+                <button pButton icon="pi pi-pencil" class="p-button-text" 
+                        (click)="editarAula(aula)" 
+                        pTooltip="Editar" tooltipPosition="bottom">
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
     </p-tabPanel>
 
-    <!-- Aba: Queimas -->
-    <p-tabPanel header="Queimas" leftIcon="pi pi-fire">
-      <div class="tab-content">
-        <div class="grid">
-          <div class="col-12">
-            <div class="section-header">
-              <h4>Queimas</h4>
-              <button pButton label="Agendar Nova Queima" icon="pi pi-plus" 
-                      (click)="agendarQueima()"></button>
-            </div>
-            
-            <p-table [value]="queimas" [paginator]="true" [rows]="10">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Data</th>
-                  <th>Horário</th>
-                  <th>Tipo</th>
-                  <th>Status</th>
-                  <th>Resultado</th>
-                  <th>Valor</th>
-                  <th>Ações</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-queima>
-                <tr>
-                  <td>{{ queima.dataQueima | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ queima.horarioInicio }} - {{ queima.horarioFim }}</td>
-                  <td>{{ getTipoQueimaLabel(queima.tipo) }}</td>
-                  <td>
-                    <p-tag [value]="getStatusQueimaLabel(queima.status)" 
-                           [severity]="getStatusQueimaSeverity(queima.status)"></p-tag>
-                  </td>
-                  <td>{{ getResultadoLabel(queima.resultado) || 'N/A' }}</td>
-                  <td>{{ queima.valor | currency:'BRL' || 'N/A' }}</td>
-                  <td>
-                    <button pButton icon="pi pi-eye" class="p-button-text" 
-                            (click)="verQueima(queima)"></button>
-                    <button pButton icon="pi pi-pencil" class="p-button-text" 
-                            (click)="editarQueima(queima)"></button>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+    <!-- Aba Queimas -->
+    <p-tabPanel header="Queimas">
+      <div class="queimas-container">
+        <div class="flex justify-content-between align-items-center mb-3">
+          <h4 class="m-0">Histórico de Queimas</h4>
+          <button pButton 
+                  label="Agendar Nova Queima" 
+                  icon="pi pi-plus" 
+                  class="p-button-outlined"
+                  (click)="onAgendarNovaQueima()">
+          </button>
         </div>
+        
+        <p-table [value]="queimas" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Status</th>
+              <th>Resultado</th>
+              <th>Custo</th>
+              <th>Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-queima>
+            <tr>
+              <td>{{ queima.data | date:'dd/MM/yyyy' }}</td>
+              <td>{{ queima.tipo }}</td>
+              <td>
+                <p-tag [value]="getStatusQueimaLabel(queima.status)" 
+                       [severity]="getStatusQueimaSeverity(queima.status)">
+                </p-tag>
+              </td>
+              <td>{{ queima.resultado || 'N/A' }}</td>
+              <td>{{ queima.custo | currency:'BRL' }}</td>
+              <td>
+                <button pButton icon="pi pi-eye" class="p-button-text" 
+                        (click)="visualizarQueima(queima)" 
+                        pTooltip="Visualizar" tooltipPosition="bottom">
+                </button>
+                <button pButton icon="pi pi-pencil" class="p-button-text" 
+                        (click)="editarQueima(queima)" 
+                        pTooltip="Editar" tooltipPosition="bottom">
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
     </p-tabPanel>
 

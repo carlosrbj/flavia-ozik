@@ -223,6 +223,34 @@ export class AlunosService {
     return novaQueima;
   }
 
+  // ===== GESTÃO DE AULAS =====
+  agendarAula(alunoId: number, data: string, horario: string, duracao: number = 180): Aula {
+    const novaAula: Aula = {
+      id: ++this.seqAula,
+      alunoId,
+      data,
+      horarioInicio: horario,
+      horarioFim: this.calcularHorarioFim(horario, duracao),
+      duracao,
+      status: 'AGENDADA',
+      presenca: 'PENDENTE',
+      tipo: 'TEORICO_PRATICA',
+      criadoEm: new Date().toISOString()
+    };
+
+    this.aulas.push(novaAula);
+    return novaAula;
+  }
+
+  private calcularHorarioFim(horarioInicio: string, duracaoMinutos: number): string {
+    const [horas, minutos] = horarioInicio.split(':').map(Number);
+    const dataInicio = new Date();
+    dataInicio.setHours(horas, minutos, 0, 0);
+    
+    const dataFim = new Date(dataInicio.getTime() + duracaoMinutos * 60000);
+    return dataFim.toTimeString().slice(0, 5);
+  }
+
   // ===== RELATÓRIOS E ESTATÍSTICAS =====
   contarMensalidadesAtrasadas(): number {
     const hoje = new Date().toISOString().split('T')[0];

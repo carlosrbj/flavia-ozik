@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Student } from '../../../core/models/student';
 import { Mensalidade } from '../../../core/models/mensalidade';
 import { Aula } from '../../../core/models/aula';
@@ -8,152 +8,74 @@ import { AlunosService } from '../../../core/services/alunos.service';
 @Component({
   selector: 'app-aluno-view',
   templateUrl: './aluno-view.component.html',
-  styleUrls: ['./aluno-view.component.scss']
+  styleUrl: './aluno-view.component.scss'
 })
 export class AlunoViewComponent implements OnInit {
-  @Input() aluno?: Student;
+  @Input() aluno!: Student;
   @Output() editarAluno = new EventEmitter<Student>();
   @Output() excluirAluno = new EventEmitter<Student>();
+  @Output() gerarMensalidade = new EventEmitter<number>();
+  @Output() agendarAula = new EventEmitter<number>();
+  @Output() agendarQueima = new EventEmitter<number>();
 
   mensalidades: Mensalidade[] = [];
   aulas: Aula[] = [];
   queimas: Queima[] = [];
 
   // Estatísticas
-  mensalidadesEmAberto = 0;
-  queimasEmAberto = 0;
-  totalPagoMensalidades = 0;
-  totalPagoQueimas = 0;
-  proximosVencimentos: Mensalidade[] = [];
+  totalMensalidades = 0;
+  mensalidadesPagas = 0;
+  mensalidadesAtrasadas = 0;
+  totalAulas = 0;
+  aulasRealizadas = 0;
+  totalQueimas = 0;
+  queimasConcluidas = 0;
 
   constructor(private alunosService: AlunosService) {}
 
   ngOnInit(): void {
-    if (this.aluno) {
-      this.carregarDados();
-    }
-  }
-
-  private carregarDados(): void {
-    if (!this.aluno?.id) return;
-
-    // Carregar mensalidades
-    this.mensalidades = this.alunosService.listarMensalidadesPorAluno(this.aluno.id);
-    
-    // Carregar aulas
-    this.aulas = this.alunosService.listarAulasPorAluno(this.aluno.id);
-    
-    // Carregar queimas
-    this.queimas = this.alunosService.listarQueimasPorAluno(this.aluno.id);
-    
-    // Calcular estatísticas
+    this.carregarDados();
     this.calcularEstatisticas();
   }
 
-  private calcularEstatisticas(): void {
-    // Mensalidades em aberto
-    this.mensalidadesEmAberto = this.mensalidades.filter(m => 
-      m.status === 'EM_ABERTO' || m.status === 'VENCIDA'
-    ).length;
-
-    // Queimas em aberto
-    this.queimasEmAberto = this.queimas.filter(q => 
-      q.status === 'AGENDADA' || q.status === 'EM_ANDAMENTO'
-    ).length;
-
-    // Total pago mensalidades
-    this.totalPagoMensalidades = this.mensalidades
-      .filter(m => m.status === 'PAGO')
-      .reduce((sum, m) => sum + (m.valorPago || 0), 0);
-
-    // Total pago queimas
-    this.totalPagoQueimas = this.queimas
-      .filter(q => q.pago)
-      .reduce((sum, q) => sum + (q.valor || 0), 0);
-
-    // Próximos vencimentos (próximos 3 meses)
-    const hoje = new Date();
-    this.proximosVencimentos = this.mensalidades
-      .filter(m => m.status === 'EM_ABERTO' && new Date(m.vencimento) >= hoje)
-      .sort((a, b) => new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime())
-      .slice(0, 3);
+  carregarDados(): void {
+    if (this.aluno.id) {
+      this.mensalidades = this.alunosService.listarMensalidadesPorAluno(this.aluno.id);
+      this.aulas = this.alunosService.listarAulasPorAluno(this.aluno.id);
+      this.queimas = this.alunosService.listarQueimasPorAluno(this.aluno.id);
+    }
   }
 
-  // Métodos de ação
-  editar(): void {
-    this.editarAluno.emit(this.aluno!);
+  calcularEstatisticas(): void {
+    this.totalMensalidades = this.mensalidades.length;
+    this.mensalidadesPagas = this.mensalidades.filter(m => m.status === 'PAGO').length;
+    this.mensalidadesAtrasadas = this.mensalidades.filter(m => m.status === 'VENCIDA').length;
+    
+    this.totalAulas = this.aulas.length;
+    this.aulasRealizadas = this.aulas.filter(a => a.status === 'REALIZADA').length;
+    
+    this.totalQueimas = this.queimas.length;
+    this.queimasConcluidas = this.queimas.filter(q => q.status === 'CONCLUIDA').length;
   }
 
-  excluir(): void {
-    this.excluirAluno.emit(this.aluno!);
+  // Métodos para Mensalidades
+  onGerarNovaMensalidade(): void {
+    if (this.aluno.id) {
+      this.gerarMensalidade.emit(this.aluno.id);
+    }
   }
 
-  gerarNovaMensalidade(): void {
-    // Implementar geração de nova mensalidade
-    console.log('Gerar nova mensalidade');
-  }
-
-  registrarPagamento(mensalidade: Mensalidade): void {
-    // Implementar registro de pagamento
-    console.log('Registrar pagamento', mensalidade);
-  }
-
-  verAulas(mensalidade: Mensalidade): void {
-    // Implementar visualização de aulas
-    console.log('Ver aulas', mensalidade);
+  visualizarMensalidade(mensalidade: Mensalidade): void {
+    console.log('Visualizar mensalidade:', mensalidade);
+    // TODO: Implementar dialog de visualização de mensalidade
   }
 
   editarMensalidade(mensalidade: Mensalidade): void {
-    // Implementar edição de mensalidade
-    console.log('Editar mensalidade', mensalidade);
+    console.log('Editar mensalidade:', mensalidade);
+    // TODO: Implementar dialog de edição de mensalidade
   }
 
-  editarAula(aula: Aula): void {
-    // Implementar edição de aula
-    console.log('Editar aula', aula);
-  }
-
-  excluirAula(aula: Aula): void {
-    // Implementar exclusão de aula
-    console.log('Excluir aula', aula);
-  }
-
-  agendarQueima(): void {
-    // Implementar agendamento de queima
-    console.log('Agendar queima');
-  }
-
-  verQueima(queima: Queima): void {
-    // Implementar visualização de queima
-    console.log('Ver queima', queima);
-  }
-
-  editarQueima(queima: Queima): void {
-    // Implementar edição de queima
-    console.log('Editar queima', queima);
-  }
-
-  // Métodos auxiliares para labels
-  getNivelLabel(nivel?: string): string {
-    const labels: { [key: string]: string } = {
-      'INICIANTE': 'Iniciante',
-      'INTERMEDIARIO': 'Intermediário',
-      'AVANCADO': 'Avançado'
-    };
-    return labels[nivel || ''] || 'Não informado';
-  }
-
-  getPagamentoLabel(forma?: string): string {
-    const labels: { [key: string]: string } = {
-      'PIX': 'PIX',
-      'CARTAO': 'Cartão',
-      'DINHEIRO': 'Dinheiro',
-      'TRANSFERENCIA': 'Transferência'
-    };
-    return labels[forma || ''] || 'Não informado';
-  }
-
-  getStatusLabel(status: string): string {
+  getStatusMensalidadeLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'EM_ABERTO': 'Em Aberto',
       'PAGO_PARCIAL': 'Pago Parcial',
@@ -164,7 +86,7 @@ export class AlunoViewComponent implements OnInit {
     return labels[status] || status;
   }
 
-  getStatusSeverity(status: string): string {
+  getStatusMensalidadeSeverity(status: string): string {
     const severities: { [key: string]: string } = {
       'EM_ABERTO': 'warning',
       'PAGO_PARCIAL': 'info',
@@ -175,35 +97,21 @@ export class AlunoViewComponent implements OnInit {
     return severities[status] || 'info';
   }
 
-  getTipoLabel(tipo: string): string {
-    const labels: { [key: string]: string } = {
-      'TEORICA': 'Teórica',
-      'PRATICA': 'Prática',
-      'TEORICO_PRATICA': 'Teórico-Prática'
-    };
-    return labels[tipo] || tipo;
+  // Métodos para Aulas
+  onAgendarNovaAula(): void {
+    if (this.aluno.id) {
+      this.agendarAula.emit(this.aluno.id);
+    }
   }
 
-  getStatusAulaLabel(status: string): string {
-    const labels: { [key: string]: string } = {
-      'AGENDADA': 'Agendada',
-      'EM_ANDAMENTO': 'Em Andamento',
-      'REALIZADA': 'Realizada',
-      'CANCELADA': 'Cancelada',
-      'REPROGRAMADA': 'Reprogramada'
-    };
-    return labels[status] || status;
+  visualizarAula(aula: Aula): void {
+    console.log('Visualizar aula:', aula);
+    // TODO: Implementar dialog de visualização de aula
   }
 
-  getStatusAulaSeverity(status: string): string {
-    const severities: { [key: string]: string } = {
-      'AGENDADA': 'info',
-      'EM_ANDAMENTO': 'warning',
-      'REALIZADA': 'success',
-      'CANCELADA': 'danger',
-      'REPROGRAMADA': 'secondary'
-    };
-    return severities[status] || 'info';
+  editarAula(aula: Aula): void {
+    console.log('Editar aula:', aula);
+    // TODO: Implementar dialog de edição de aula
   }
 
   getPresencaLabel(presenca: string): string {
@@ -226,14 +134,21 @@ export class AlunoViewComponent implements OnInit {
     return severities[presenca] || 'info';
   }
 
-  getTipoQueimaLabel(tipo: string): string {
-    const labels: { [key: string]: string } = {
-      'BISCOITO': 'Biscoito',
-      'ESMALTE': 'Esmalte',
-      'RAKU': 'Raku',
-      'OUTRO': 'Outro'
-    };
-    return labels[tipo] || tipo;
+  // Métodos para Queimas
+  onAgendarNovaQueima(): void {
+    if (this.aluno.id) {
+      this.agendarQueima.emit(this.aluno.id);
+    }
+  }
+
+  visualizarQueima(queima: Queima): void {
+    console.log('Visualizar queima:', queima);
+    // TODO: Implementar dialog de visualização de queima
+  }
+
+  editarQueima(queima: Queima): void {
+    console.log('Editar queima:', queima);
+    // TODO: Implementar dialog de edição de queima
   }
 
   getStatusQueimaLabel(status: string): string {
@@ -256,13 +171,33 @@ export class AlunoViewComponent implements OnInit {
     return severities[status] || 'info';
   }
 
-  getResultadoLabel(resultado?: string): string {
-    if (!resultado) return 'N/A';
+  // Métodos existentes
+  onEditar(): void {
+    this.editarAluno.emit(this.aluno);
+  }
+
+  onExcluir(): void {
+    this.excluirAluno.emit(this.aluno);
+  }
+
+  getNivelLabel(nivel?: string): string {
+    if (!nivel) return 'Não informado';
     const labels: { [key: string]: string } = {
-      'SUCESSO': 'Sucesso',
-      'PARCIAL': 'Parcial',
-      'FALHA': 'Falha'
+      'INICIANTE': 'Iniciante',
+      'INTERMEDIARIO': 'Intermediário',
+      'AVANCADO': 'Avançado'
     };
-    return labels[resultado] || resultado;
+    return labels[nivel] || nivel;
+  }
+
+  getFormaPagamentoLabel(forma?: string): string {
+    if (!forma) return 'Não informado';
+    const labels: { [key: string]: string } = {
+      'PIX': 'PIX',
+      'CARTAO': 'Cartão',
+      'DINHEIRO': 'Dinheiro',
+      'TRANSFERENCIA': 'Transferência'
+    };
+    return labels[forma] || forma;
   }
 }
